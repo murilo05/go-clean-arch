@@ -1,4 +1,4 @@
-# 🚧 Project in Progress
+#  Project in Progress
 
 This project is currently under development and aims to provide a clean and well-structured **starter template using Clean Architecture in Go**.
 
@@ -6,7 +6,7 @@ The purpose of this template is to offer a solid foundation for building scalabl
 
 ---
 
-## 📦 What This Template Will Include
+##  What This Template Will Include
 
 - Standard **Clean Architecture** layout  
 - Domain, Use Case, and Infrastructure layers  
@@ -17,6 +17,6 @@ The purpose of this template is to offer a solid foundation for building scalabl
 
 ---
 
-## 🛠 Status
+##  Status
 
 The project is actively being built.  
