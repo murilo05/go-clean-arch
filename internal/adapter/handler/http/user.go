@@ -7,8 +7,10 @@ import (
 )
 
 type registerRequest struct {
+	Document string `json:"document" binding:"required,min=11" example:"12345678911"`
 	Name     string `json:"name" binding:"required" example:"John Doe"`
-	Age      int    `json:"age" binding:"required" example:"18"`
+	Email    string `json:"email" binding:"required" example:"murilo@gmail.com"`
+	Age      int    `json:"age" binding:"required" example:"23"`
 	Password string `json:"password" binding:"required,min=8" example:"12345678"`
 }
 
@@ -35,12 +37,14 @@ func (h *Handler) Register(ctx *gin.Context) {
 	}
 
 	user := domain.User{
+		Document: req.Document,
 		Name:     req.Name,
+		Email:    req.Email,
 		Age:      req.Age,
 		Password: req.Password,
 	}
 
-	_, err := h.userUseCase.CreateUser(ctx, &user)
+	err := h.userUseCase.CreateUser(ctx, &user)
 	if err != nil {
 		handleError(ctx, err)
 		return

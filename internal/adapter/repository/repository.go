@@ -19,7 +19,7 @@ func NewRepository(db UserRepository, logger *zap.SugaredLogger) *Repository {
 	}
 }
 
-func (r *Repository) Save(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (r *Repository) Save(ctx context.Context, user *domain.User) error {
 	return r.db.Save(context.TODO(), &domain.User{})
 }
 

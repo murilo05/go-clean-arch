@@ -38,7 +38,7 @@ func NewRouter(
 	{
 		user := v1.Group("/user")
 		{
-			user.POST("/", handler.Register)
+			user.POST("", handler.Register)
 		}
 	}
 

@@ -26,10 +26,7 @@ func main() {
 	zap, _ := zap.NewProduction()
 	defer zap.Sync()
 	logger := zap.Sugar()
-	logger.Info("Starting the application",
-		"app", config.App.Name,
-		"env", config.App.Env,
-	)
+	logger.Info("Starting the application: ", config.App.Name, "-", config.App.Env)
 
 	ctx := context.Background()
 
