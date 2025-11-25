@@ -12,21 +12,22 @@ import (
 
 var _ repository.UserRepository = &Postgres{}
 
-func (pg *Postgres) Save(ctx context.Context, user *domain.User) (*domain.User, error) {
-
+func (pg *Postgres) Save(ctx context.Context, user *domain.User) error {
 	query := pg.db.QueryBuilder.Insert("public.user").
-		Columns("name", "age", "password", "created_at", "updated_at").
-		Values(user.Name, user.Age, time.Now(), time.Now()).
+		Columns("id", "document", "name", "email", "age", "password", "created_at", "updated_at").
+		Values(user.ID, user.Document, user.Name, user.Email, user.Age, user.Password, time.Now(), time.Now()).
 		Suffix("RETURNING *")
 
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	//Criar ID Idepotente
 	err = pg.db.QueryRow(ctx, sql, args...).Scan(
+		&user.ID,
+		&user.Document,
 		&user.Name,
+		&user.Email,
 		&user.Age,
 		&user.Password,
 		&user.CreatedAt,
@@ -34,15 +35,15 @@ func (pg *Postgres) Save(ctx context.Context, user *domain.User) (*domain.User, 
 	)
 	if err != nil {
 		if errCode := pg.db.ErrorCode(err); errCode == "23505" {
-			return nil, domain.ErrConflictingData
+			return domain.ErrConflictingData
 		}
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	return nil
 }
 
-func (pg *Postgres) Get(ctx context.Context, id uint64) (*domain.User, error) {
+func (pg *Postgres) Get(ctx context.Context, id string) (*domain.User, error) {
 	var user domain.User
 
 	query := pg.db.QueryBuilder.Select("*").
@@ -57,8 +58,11 @@ func (pg *Postgres) Get(ctx context.Context, id uint64) (*domain.User, error) {
 
 	err = pg.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
+		&user.Document,
 		&user.Name,
+		&user.Email,
 		&user.Age,
+		&user.Password,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -96,8 +100,11 @@ func (pg *Postgres) List(ctx context.Context, skip, limit uint64) ([]domain.User
 	for rows.Next() {
 		err := rows.Scan(
 			&user.ID,
+			&user.Document,
 			&user.Name,
+			&user.Email,
 			&user.Age,
+			&user.Password,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
@@ -141,7 +148,7 @@ func (pg *Postgres) Update(ctx context.Context, user *domain.User) (*domain.User
 	return user, nil
 }
 
-func (pg *Postgres) Delete(ctx context.Context, id uint64) error {
+func (pg *Postgres) Delete(ctx context.Context, id string) error {
 	query := pg.db.QueryBuilder.Delete("public.user").
 		Where(sq.Eq{"id": id})
 

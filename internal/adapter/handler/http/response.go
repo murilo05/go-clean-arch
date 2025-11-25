@@ -54,11 +54,15 @@ func newAuthResponse(token string) authResponse {
 	}
 }
 
+// TODO: REMOVE FROM PAYLOAD SENSITIVE DATA (PASSWORD), ADDED ONLY FOR LOCAL TEST AND COMPILATION
 // userResponse represents a user response body
 type userResponse struct {
+	Document  string    `json:"document" binding:"required,min=11" example:"12345678911"`
 	ID        string    `json:"id" example:"1"`
 	Name      string    `json:"name" example:"John Doe"`
 	Email     string    `json:"email" example:"test@example.com"`
+	Age       int       `json:"age" binding:"required" example:"23"`
+	Password  string    `json:"password" binding:"required,min=8" example:"12345678"`
 	CreatedAt time.Time `json:"created_at" example:"1970-01-01T00:00:00Z"`
 	UpdatedAt time.Time `json:"updated_at" example:"1970-01-01T00:00:00Z"`
 }
@@ -67,7 +71,11 @@ type userResponse struct {
 func newUserResponse(user *domain.User) userResponse {
 	return userResponse{
 		ID:        user.ID,
+		Document:  user.Document,
 		Name:      user.Name,
+		Email:     user.Email,
+		Age:       user.Age,
+		Password:  user.Password,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
@@ -153,4 +161,10 @@ func newErrorResponse(errMsgs []string) errorResponse {
 func handleSuccess(ctx *gin.Context, data any) {
 	rsp := newResponse(true, "Success", data)
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+// handleCreated sends a created response with the specified status code and optional data
+func handleCreated(ctx *gin.Context, data any) {
+	rsp := newResponse(true, "Created", data)
+	ctx.JSON(http.StatusCreated, rsp)
 }
