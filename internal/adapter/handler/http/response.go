@@ -162,3 +162,9 @@ func handleSuccess(ctx *gin.Context, data any) {
 	rsp := newResponse(true, "Success", data)
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+// handleCreated sends a created response with the specified status code and optional data
+func handleCreated(ctx *gin.Context, data any) {
+	rsp := newResponse(true, "Created", data)
+	ctx.JSON(http.StatusCreated, rsp)
+}
