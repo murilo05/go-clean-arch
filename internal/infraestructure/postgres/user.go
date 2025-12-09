@@ -118,34 +118,40 @@ func (pg *Postgres) List(ctx context.Context, skip, limit uint64) ([]domain.User
 	return users, nil
 }
 
-func (pg *Postgres) Update(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (pg *Postgres) Update(ctx context.Context, user *domain.User) error {
 	query := pg.db.QueryBuilder.Update("public.user").
+		Set("document", sq.Expr("COALESCE(?, document)", user.Document)).
 		Set("name", sq.Expr("COALESCE(?, name)", user.Name)).
-		Set("age", sq.Expr("COALESCE(?, email)", user.Age)).
+		Set("email", sq.Expr("COALESCE(?, email)", user.Email)).
+		Set("age", sq.Expr("COALESCE(?, age)", user.Age)).
+		Set("password", sq.Expr("COALESCE(?, password)", user.Password)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
 		Suffix("RETURNING *")
 
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = pg.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
+		&user.Document,
 		&user.Name,
+		&user.Email,
 		&user.Age,
+		&user.Password,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
 	if err != nil {
 		if errCode := pg.db.ErrorCode(err); errCode == "23505" {
-			return nil, domain.ErrConflictingData
+			return domain.ErrConflictingData
 		}
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	return nil
 }
 
 func (pg *Postgres) Delete(ctx context.Context, id string) error {

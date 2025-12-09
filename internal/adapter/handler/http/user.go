@@ -110,7 +110,7 @@ func toMap(m meta, data any, key string) map[string]any {
 
 // getUserRequest represents the request body for getting a user
 type getUserRequest struct {
-	ID string `uri:"id" binding:"required,min=1" example:"1"`
+	ID string `uri:"id" binding:"required,min=1" example:"f99c44eb088fbc06a040a359491b19ac479deca49b84508c9524eb41463a14dd"`
 }
 
 // GetUser godoc
@@ -143,4 +143,91 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 	rsp := newUserResponse(user)
 
 	handleSuccess(ctx, rsp)
+}
+
+// updateUserRequest represents the request body to update a user
+type updateUserRequest struct {
+	ID       string `json:"id" binding:"required" example:"f99c44eb088fbc06a040a359491b19ac479deca49b84508c9524eb41463a14dd"`
+	Document string `json:"document" binding:"required" example:"12345678911"`
+	Name     string `json:"name" binding:"required" example:"John Doe"`
+	Email    string `json:"email" binding:"required" example:"murilo@gmail.com"`
+	Age      int    `json:"age" binding:"required" example:"23"`
+	Password string `json:"password" binding:"required" example:"12345678"`
+}
+
+// UpdateUser godoc
+//
+//	@Summary		Update a user
+//	@Description	Update a user by id
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string			true	"User ID"
+//	@Success		200	{object}	userResponse	"User displayed"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
+//	@Router			/users/{id} [delete]
+//	@Security		BearerAuth
+func (h *Handler) UpdateUser(ctx *gin.Context) {
+
+	var req updateUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		validationError(ctx, err)
+		return
+	}
+
+	user := domain.User{
+		ID:       req.ID,
+		Document: req.Document,
+		Name:     req.Name,
+		Email:    req.Email,
+		Age:      req.Age,
+		Password: req.Password,
+	}
+
+	err := h.userUseCase.UpdateUser(ctx, &user)
+	if err != nil {
+		handleError(ctx, err)
+		return
+	}
+
+	rsp := newUserResponse(&user)
+
+	handleUpdated(ctx, rsp)
+}
+
+// deleteUserRequest represents the request body to delete a user
+type deleteUserRequest struct {
+	ID string `uri:"id" binding:"required,min=1" example:"f99c44eb088fbc06a040a359491b19ac479deca49b84508c9524eb41463a14dd"`
+}
+
+// DeleteUser godoc
+//
+//	@Summary		Delete a user
+//	@Description	Delete a user by id
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string			true	"User ID"
+//	@Success		200	{object}	userResponse	"User displayed"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
+//	@Router			/users/{id} [delete]
+//	@Security		BearerAuth
+func (h *Handler) DeleteUser(ctx *gin.Context) {
+	var req deleteUserRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		validationError(ctx, err)
+		return
+	}
+
+	err := h.userUseCase.DeleteUser(ctx, req.ID)
+	if err != nil {
+		handleError(ctx, err)
+		return
+	}
+
+	handleDeleted(ctx, req.ID)
 }
