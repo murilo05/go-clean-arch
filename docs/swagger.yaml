@@ -1,0 +1,297 @@
+definitions:
+  http.errorResponse:
+    properties:
+      messages:
+        example:
+        - Error message 1
+        - ' Error message 2'
+        items:
+          type: string
+        type: array
+      success:
+        example: false
+        type: boolean
+    type: object
+  http.registerRequest:
+    properties:
+      age:
+        example: 23
+        type: integer
+      document:
+        example: "12345678911"
+        minLength: 11
+        type: string
+      email:
+        example: murilo@gmail.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "12345678"
+        minLength: 8
+        type: string
+    required:
+    - age
+    - document
+    - email
+    - name
+    - password
+    type: object
+  http.response:
+    properties:
+      data: {}
+      message:
+        example: Success
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  http.updateUserRequest:
+    properties:
+      age:
+        example: 23
+        type: integer
+      document:
+        example: "12345678911"
+        type: string
+      email:
+        example: murilo@gmail.com
+        type: string
+      id:
+        example: f99c44eb088fbc06a040a359491b19ac479deca49b84508c9524eb41463a14dd
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "12345678"
+        type: string
+    required:
+    - age
+    - document
+    - email
+    - id
+    - name
+    - password
+    type: object
+  http.userResponse:
+    properties:
+      age:
+        example: 23
+        type: integer
+      created_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      document:
+        example: "12345678911"
+        minLength: 11
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      id:
+        example: "1"
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "12345678"
+        minLength: 8
+        type: string
+      updated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+    required:
+    - age
+    - document
+    - password
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/user:
+    get:
+      consumes:
+      - application/json
+      description: List users with pagination
+      parameters:
+      - description: Skip
+        format: int64
+        in: query
+        name: skip
+        type: integer
+      - description: Limit
+        format: int64
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users listed successfully
+          schema:
+            $ref: '#/definitions/http.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: create a new user account with default role "customer"
+      parameters:
+      - description: Register request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/http.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema:
+            $ref: '#/definitions/http.userResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      summary: Register a new user
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update a user by id
+      parameters:
+      - description: Update user request
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/http.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/http.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a user
+      tags:
+      - User
+  /v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            $ref: '#/definitions/http.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Get a user by id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User displayed successfully
+          schema:
+            $ref: '#/definitions/http.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a user
+      tags:
+      - User
+swagger: "2.0"

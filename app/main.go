@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	_ "go-clean-arch/docs"
 	handler "go-clean-arch/internal/adapter/handler/http"
 	"go-clean-arch/internal/adapter/repository"
 	"go-clean-arch/internal/core/usecase"
