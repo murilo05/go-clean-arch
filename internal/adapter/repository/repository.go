@@ -31,7 +31,7 @@ func (r *Repository) Get(ctx context.Context, id string) (*domain.User, error) {
 	return r.db.Get(context.TODO(), id)
 }
 
-func (r *Repository) Update(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (r *Repository) Update(ctx context.Context, user *domain.User) error {
 	return r.db.Update(context.TODO(), user)
 }
 

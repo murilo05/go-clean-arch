@@ -41,6 +41,8 @@ func NewRouter(
 			user.POST("", handler.Register)
 			user.GET("", handler.ListUsers)
 			user.GET("/:id", handler.GetUser)
+			user.PUT("/", handler.UpdateUser)
+			user.DELETE("/:id", handler.DeleteUser)
 		}
 	}
 

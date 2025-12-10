@@ -23,9 +23,17 @@ func main() {
 	}
 
 	//Starting Zap Logs - (Sugar is better for performance)
-	zap, _ := zap.NewProduction()
-	defer zap.Sync()
-	logger := zap.Sugar()
+	var zp *zap.Logger
+
+	switch config.App.Env {
+	case "development":
+		zp, _ = zap.NewDevelopment()
+	default:
+		zp, _ = zap.NewProduction()
+	}
+
+	defer zp.Sync()
+	logger := zp.Sugar()
 	logger.Info("Starting the application: ", config.App.Name, "-", config.App.Env)
 
 	ctx := context.Background()

@@ -64,10 +64,33 @@ func (us *UserService) ListUsers(ctx context.Context, skip, limit uint64) ([]dom
 	return users, nil
 }
 
-func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	return nil, nil
+func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) error {
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		us.logger.Error("Failed to hash password: ", err)
+		return domain.ErrInternal
+	}
+	user.Password = hashedPassword
+
+	err = us.UserRepo.Update(ctx, user)
+	if err != nil {
+		if err == domain.ErrConflictingData {
+			us.logger.Error("data already exist: ", err)
+			return err
+		}
+		us.logger.Error("failed to update user: ", err)
+		return domain.ErrInternal
+	}
+
+	return nil
 }
 
 func (us *UserService) DeleteUser(ctx context.Context, id string) error {
+	err := us.UserRepo.Delete(ctx, id)
+	if err != nil {
+		us.logger.Error("failed to delete user: ", err)
+		return err
+	}
+
 	return nil
 }

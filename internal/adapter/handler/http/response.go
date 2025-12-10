@@ -168,3 +168,15 @@ func handleCreated(ctx *gin.Context, data any) {
 	rsp := newResponse(true, "Created", data)
 	ctx.JSON(http.StatusCreated, rsp)
 }
+
+// handleDeleted sends a deleted response with the specified status code and optional data
+func handleDeleted(ctx *gin.Context, data any) {
+	rsp := newResponse(true, "Deleted", data)
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+// handleUpdated sends a updated response with the specified status code and optional data
+func handleUpdated(ctx *gin.Context, data any) {
+	rsp := newResponse(true, "Updated", data)
+	ctx.JSON(http.StatusOK, rsp)
+}
