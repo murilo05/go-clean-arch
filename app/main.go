@@ -25,7 +25,7 @@ func main() {
 	//Starting Zap Logs - (Sugar is better for performance)
 	var zp *zap.Logger
 
-	switch os.Getenv("ENVIRONMENT") {
+	switch config.App.Env {
 	case "development":
 		zp, _ = zap.NewDevelopment()
 	default:
