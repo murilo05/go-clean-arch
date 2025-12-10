@@ -22,11 +22,18 @@ func main() {
 		log.Fatal("Error loading environment variables: ", err)
 	}
 
-	//TODO CREATE PRD VALIDATION
 	//Starting Zap Logs - (Sugar is better for performance)
-	zap, _ := zap.NewDevelopment()
-	defer zap.Sync()
-	logger := zap.Sugar()
+	var zp *zap.Logger
+
+	switch os.Getenv("ENVIRONMENT") {
+	case "development":
+		zp, _ = zap.NewDevelopment()
+	default:
+		zp, _ = zap.NewProduction()
+	}
+
+	defer zp.Sync()
+	logger := zp.Sugar()
 	logger.Info("Starting the application: ", config.App.Name, "-", config.App.Env)
 
 	ctx := context.Background()
